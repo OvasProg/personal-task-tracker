@@ -61,6 +61,66 @@ export class TaskService {
     return strategy.sort(tasks);
   }
 
+  async getStatistics(): Promise<{
+    totalTasks: number;
+    priorityBreakdown: Record<Priority, number>;
+    overdueTasks: number;
+  }> {
+    const tasks = await this.getAllTasks();
+    const now = new Date();
+    
+    const stats = {
+      totalTasks: tasks.length,
+      priorityBreakdown: {
+        [Priority.LOW]: 0,
+        [Priority.MEDIUM]: 0,
+        [Priority.HIGH]: 0,
+      },
+      overdueTasks: 0,
+    };
+
+    for (const task of tasks) {
+      stats.priorityBreakdown[task.priority]++;
+      if (task.dueDate.getTime() < now.getTime()) {
+        stats.overdueTasks++;
+      }
+    }
+
+    return stats;
+  }
+
+  async exportToJson(targetPath: string): Promise<void> {
+    const tasks = await this.getAllTasks();
+    const { writeFile } = await import('fs/promises');
+    await writeFile(targetPath, JSON.stringify(tasks, null, 2), 'utf-8');
+  }
+
+  async exportToCsv(targetPath: string): Promise<void> {
+    const tasks = await this.getAllTasks();
+    const headers = ['id', 'title', 'description', 'priority', 'dueDate'];
+    
+    const rows = tasks.map(t => {
+      return [
+        t.id,
+        this.escapeCsv(t.title),
+        this.escapeCsv(t.description),
+        t.priority,
+        t.dueDate.toISOString()
+      ].join(',');
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const { writeFile } = await import('fs/promises');
+    await writeFile(targetPath, csvContent, 'utf-8');
+  }
+
+  private escapeCsv(text: string): string {
+    if (text.includes(',') || text.includes('\n') || text.includes('"')) {
+      return `"${text.replace(/"/g, '""')}"`;
+    }
+    return text;
+  }
+
   /**
    * INTENTIONAL CODE SMELL: Long Method / God Object
    * This method is intentionally bloated for Phase 6 refactoring.

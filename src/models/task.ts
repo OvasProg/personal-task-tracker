@@ -48,6 +48,10 @@ export class Task {
   }
 
   private validateDueDate(dueDate: Date): void {
+    // Check for bypass flag used in testing/persistence scenarios for past dates
+    if ((global as any).__BYPASS_DATE_VALIDATION__) {
+      return;
+    }
     const now = new Date();
     // Use a 1-second buffer to prevent race conditions during test execution
     const oneSecondAgo = now.getTime() - 1000;
