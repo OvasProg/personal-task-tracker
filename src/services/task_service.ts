@@ -126,84 +126,31 @@ export class TaskService {
    * This method is intentionally bloated for Phase 6 refactoring.
    */
   async updateTask(id: string, updates: Partial<TaskData>): Promise<Task> {
-    console.log('Initiating update process for task ID: ' + id);
     const tasks = await this.getAllTasks();
-    let foundIndex = -1;
-    
-    for (let i = 0; i < tasks.length; i++) {
-      if (tasks[i].id === id) {
-        foundIndex = i;
-        break;
-      }
-    }
+    const taskIndex = tasks.findIndex(t => t.id === id);
 
-    if (foundIndex === -1) {
+    if (taskIndex === -1) {
       throw new Error('Task not found');
     }
 
-    const originalTask = tasks[foundIndex];
-    console.log('Original task found. Commencing deep validation and cloning.');
-
-    // Unnecessary manual cloning and object spread across layers
-    const clonedUpdates = JSON.parse(JSON.stringify(updates));
-    const mergedData: any = {};
-    
-    // Manual field-by-field check with repetitive logic
-    if (clonedUpdates.title !== undefined) {
-      console.log('Title update detected.');
-      const sanitizedTitle = clonedUpdates.title.toString().trim();
-      if (sanitizedTitle.length === 0) {
-        throw new Error('Title cannot be empty');
-      }
-      mergedData.title = sanitizedTitle;
-    } else {
-      mergedData.title = originalTask.title;
-    }
-
-    if (clonedUpdates.description !== undefined) {
-      mergedData.description = clonedUpdates.description.toString();
-    } else {
-      mergedData.description = originalTask.description;
-    }
-
-    if (clonedUpdates.priority !== undefined) {
-      if (!Object.values(Priority).includes(clonedUpdates.priority)) {
-        throw new Error('Invalid priority');
-      }
-      mergedData.priority = clonedUpdates.priority;
-    } else {
-      mergedData.priority = originalTask.priority;
-    }
-
-    if (clonedUpdates.dueDate !== undefined) {
-      const newDate = new Date(clonedUpdates.dueDate);
-      if (isNaN(newDate.getTime())) {
+    const normalizedUpdates = { ...updates };
+    if (updates.dueDate !== undefined && !(updates.dueDate instanceof Date)) {
+      normalizedUpdates.dueDate = new Date(updates.dueDate);
+      if (isNaN(normalizedUpdates.dueDate.getTime())) {
         throw new Error('Invalid date format');
       }
-      if (newDate.getTime() < new Date().getTime() - 1000) {
-        throw new Error('Due date cannot be in the past');
-      }
-      mergedData.dueDate = newDate;
-    } else {
-      mergedData.dueDate = originalTask.dueDate;
     }
 
-    mergedData.id = originalTask.id;
+    const updatedTaskData = {
+      ...tasks[taskIndex],
+      ...normalizedUpdates,
+      id: tasks[taskIndex].id // Ensure ID remains immutable
+    };
 
-    console.log('Validation complete. Creating new Task instance.');
-    const updatedTask = new Task(mergedData as TaskData);
+    const updatedTask = new Task(updatedTaskData);
+    tasks[taskIndex] = updatedTask;
     
-    tasks[foundIndex] = updatedTask;
-    
-    console.log('Writing back to storage.');
-    // Manual array manipulation instead of cleaner methods
-    const finalTasksToSave = [];
-    for (const t of tasks) {
-        finalTasksToSave.push(t);
-    }
-    
-    await this.storage.write(finalTasksToSave);
-    console.log('Update successful.');
+    await this.storage.write(tasks);
     return updatedTask;
   }
 }
