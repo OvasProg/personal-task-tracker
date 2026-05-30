@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+.env
+*.log
+.DS_Store
+.eslintcache
+PROJECT_INSTRUCTIONS.md
+PROJECT_PHASES.md
