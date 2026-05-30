@@ -31,12 +31,12 @@ describe('Acceptance Tests (BDD/ATDD)', () => {
     mockStorage.read.mockResolvedValue([]);
 
     // When
-    const newTask = await taskService.createTask(
-      'New Acceptance Task',
-      'Testing BDD',
-      Priority.MEDIUM,
-      new Date(Date.now() + 1000000)
-    );
+    const newTask = await taskService.createTask({
+      title: 'New Acceptance Task',
+      description: 'Testing BDD',
+      priority: Priority.MEDIUM,
+      dueDate: new Date(Date.now() + 1000000)
+    });
 
     // Then
     expect(mockStorage.write).toHaveBeenCalled();

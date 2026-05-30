@@ -1,13 +1,13 @@
-import { Task, Priority, TaskData } from '../models/task';
+import { Task, Priority, TaskData, CreateTaskDTO } from '../models/task';
 import { StorageAdapter } from '../storage/adapter';
 import { SortStrategy } from '../patterns/strategy';
 
 export class TaskService {
   constructor(private storage: StorageAdapter<Task>) {}
 
-  async createTask(title: string, description: string, priority: Priority, dueDate: Date): Promise<Task> {
+  async createTask(dto: CreateTaskDTO): Promise<Task> {
     const id = Math.random().toString(36).substring(2, 11);
-    const newTask = new Task({ id, title, description, priority, dueDate });
+    const newTask = new Task({ id, ...dto });
     const tasks = await this.storage.read();
     tasks.push(newTask);
     await this.storage.write(tasks);

@@ -8,8 +8,8 @@ export class JsonStorageAdapter<T> implements StorageAdapter<T> {
     try {
       const content = await readFile(this.filePath, 'utf-8');
       return JSON.parse(content) as T[];
-    } catch (error: any) {
-      if (error.code === 'ENOENT') {
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
         return [];
       }
       throw error;

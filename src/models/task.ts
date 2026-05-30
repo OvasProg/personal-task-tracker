@@ -12,6 +12,13 @@ export interface TaskData {
   dueDate: Date;
 }
 
+export interface CreateTaskDTO {
+  title: string;
+  description: string;
+  priority: Priority;
+  dueDate: Date;
+}
+
 export class Task {
   public id: string;
   public title: string;
@@ -49,7 +56,8 @@ export class Task {
 
   private validateDueDate(dueDate: Date): void {
     // Check for bypass flag used in testing/persistence scenarios for past dates
-    if ((global as any).__BYPASS_DATE_VALIDATION__) {
+    const globalObj = globalThis as unknown as { __BYPASS_DATE_VALIDATION__?: boolean };
+    if (globalObj.__BYPASS_DATE_VALIDATION__) {
       return;
     }
     const now = new Date();

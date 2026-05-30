@@ -1,6 +1,6 @@
 import * as readline from 'readline';
 import { TaskService } from '../services/task_service';
-import { Priority } from '../models/task';
+import { Priority, Task } from '../models/task';
 import { SortByDateStrategy, SortByPriorityStrategy } from '../patterns/strategy';
 
 export class CLI {
@@ -52,8 +52,12 @@ export class CLI {
           case '0': running = false; break;
           default: console.log('Invalid option.');
         }
-      } catch (error: any) {
-        console.error(`Error: ${error.message}`);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error(`Error: ${error.message}`);
+        } else {
+          console.error('An unknown error occurred.');
+        }
       }
     }
 
@@ -70,7 +74,7 @@ export class CLI {
     const priority = Priority[priorityStr.toUpperCase() as keyof typeof Priority];
     const dueDate = new Date(dueDateStr);
 
-    const task = await this.taskService.createTask(title, description, priority, dueDate);
+    const task = await this.taskService.createTask({ title, description, priority, dueDate });
     console.log(`Task created with ID: ${task.id}`);
   }
 
@@ -86,7 +90,7 @@ export class CLI {
     const priorityStr = await this.question('New Priority (leave blank to skip): ');
     const dueDateStr = await this.question('New Due Date (YYYY-MM-DD, leave blank to skip): ');
 
-    const updates: any = {};
+    const updates: Partial<{ title: string; description: string; priority: Priority; dueDate: Date }> = {};
     if (title) updates.title = title;
     if (description) updates.description = description;
     if (priorityStr) updates.priority = Priority[priorityStr.toUpperCase() as keyof typeof Priority];
@@ -149,7 +153,7 @@ export class CLI {
     console.log(`  LOW: ${stats.priorityBreakdown[Priority.LOW]}`);
   }
 
-  private printTasks(tasks: any[]): void {
+  private printTasks(tasks: Task[]): void {
     if (tasks.length === 0) {
       console.log('No tasks found.');
       return;

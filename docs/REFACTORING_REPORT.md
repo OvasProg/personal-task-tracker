@@ -54,3 +54,26 @@ async updateTask(id: string, updates: Partial<TaskData>): Promise<Task> {
 ## 4. Final Reflection
 
 The refactoring of `updateTask` demonstrates the immense value of the **Single Responsibility Principle (SRP)**. By delegating validation logic to the `Task` entity's constructor and leveraging modern JavaScript features like the spread operator and `findIndex`, we transformed a brittle, hard-to-read "God Method" into a concise and robust operation. This not only reduces the surface area for bugs but also makes the codebase significantly easier for other engineers to reason about and extend.
+
+## 5. Additional System Refactoring
+
+Following the initial logic extraction, the codebase underwent a rigorous system review targeting structural smells and TypeScript strictness.
+
+### Data Clump Resolution
+The `TaskService.createTask` method previously accepted a long list of parameters, creating a **Data Clump** smell. This was resolved by introducing a `CreateTaskDTO` interface, grouping related parameters into a single structured object.
+
+**Before:**
+```typescript
+async createTask(title: string, description: string, priority: Priority, dueDate: Date): Promise<Task>
+```
+
+**After:**
+```typescript
+async createTask(dto: CreateTaskDTO): Promise<Task>
+```
+
+### Strict Asynchronous Error Handling
+To improve TypeScript rigor, all `any` types were removed from the production source. In `src/cli/commands.ts`, catch blocks were refactored from `catch (error: any)` to `catch (error: unknown)`. This necessitated the use of `instanceof Error` type guards, ensuring that only valid Error objects are accessed, thereby preventing runtime exceptions during error reporting.
+
+### Global Scope Standardization
+The validation bypass mechanism was updated to use `globalThis` instead of the Node-specific `global` object. This ensures the codebase remains compatible with standard TypeScript environments and modern JavaScript runtimes.

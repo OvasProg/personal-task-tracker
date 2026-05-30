@@ -35,7 +35,12 @@ describe('TaskService', () => {
   describe('CRUD Operations', () => {
     it('should create a task and save it', async () => {
       const title = 'New Task';
-      const result = await taskService.createTask(title, 'Desc', Priority.MEDIUM, new Date(Date.now() + 100000));
+      const result = await taskService.createTask({
+        title,
+        description: 'Desc',
+        priority: Priority.MEDIUM,
+        dueDate: new Date(Date.now() + 100000)
+      });
       
       expect(result.title).toBe(title);
       expect(mockStorage.write).toHaveBeenCalled();
