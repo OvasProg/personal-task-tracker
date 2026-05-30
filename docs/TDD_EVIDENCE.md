@@ -19,7 +19,7 @@ This document tracks the Test-Driven Development (TDD) lifecycle for the core `T
 ### 3. Refactor Phase (Code Improvement)
 
 - **Commit Message:** `refactor: extract validation logic and generate TDD evidence document`
-- **Hash:** ` `
+- **Hash:** `d76b83ae6aa5ae5218d36ddb37d4c24d4c436023`
 - **Description:**
   - Refactored `Task` class to extract validation logic into a private `validate` method and sub-methods (`validateTitle`, `validatePriority`, `validateDueDate`).
   - Improved readability of the date validation logic.
