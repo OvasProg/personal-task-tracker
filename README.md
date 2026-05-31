@@ -1,5 +1,7 @@
 # Personal Task Tracker CLI
 
+![CI Pipeline](https://github.com/OvasProg/personal-task-tracker/actions/workflows/ci.yml/badge.svg)
+
 A professional, high-integrity command-line application for managing personal tasks, engineered with strict software engineering practices including TDD, Design Patterns, and Automated CI.
 
 ## 🚀 Key Features
@@ -23,30 +25,36 @@ A professional, high-integrity command-line application for managing personal ta
 ## 💻 Setup and Execution
 
 ### Prerequisites
+
 - Node.js (v20 or higher)
 - npm
 
 ### Installation
+
 ```bash
 npm install
 ```
 
 ### Build
+
 ```bash
 npm run build
 ```
 
 ### Start Application
+
 ```bash
 npm start
 ```
 
 ### Run Tests
+
 ```bash
 npm test
 ```
 
 ### Run Linter
+
 ```bash
 npm run lint
 ```
@@ -63,6 +71,7 @@ npm run lint
 ## 🚦 Continuous Integration
 
 Every push to the main branch triggers our GitHub Actions CI pipeline, which executes:
+
 1.  Dependency Installation
 2.  Source Compilation
 3.  Linting & Static Analysis
