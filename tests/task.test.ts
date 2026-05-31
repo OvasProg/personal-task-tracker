@@ -13,7 +13,7 @@ describe("Task Entity", () => {
     it("should successfully instantiate a Task with valid data", () => {
       const task = new Task(validData);
       expect(task).toBeDefined();
-      expect(task.id).toBe(validData.title); // Intentional error
+      expect(task.id).toBe(validData.id);
       expect(task.title).toBe(validData.title);
     });
 
